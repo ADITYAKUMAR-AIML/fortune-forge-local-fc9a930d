@@ -102,7 +102,16 @@ function triggerEvent(state: GameState, forced?: boolean) {
   if (event.cashEffect && event.cashEffect < 0) removeMoney(state, Math.min(state.player.cash, Math.abs(event.cashEffect)), "random_event", event.title);
   state.player.reputation += event.reputationEffect ?? 0;
   if (event.marketCondition) state.marketCondition = event.marketCondition;
-  if (event.duration && (event.marketModifier || event.businessIncomeModifier || event.businessExpenseModifier)) state.activeModifiers.unshift({ id: `${event.id}_${Date.now()}`, label: event.title, daysRemaining: event.duration, marketModifier: event.marketModifier, businessIncomeModifier: event.businessIncomeModifier, businessExpenseModifier: event.businessExpenseModifier, affectedSector: event.affectedSector, affectedStock: event.affectedStock });
+  if (event.duration && (event.marketModifier || event.businessIncomeModifier || event.businessExpenseModifier)) state.activeModifiers.unshift({
+    id: `${event.id}_${Date.now()}`,
+    label: event.title,
+    daysRemaining: event.duration,
+    ...(event.marketModifier !== undefined ? { marketModifier: event.marketModifier } : {}),
+    ...(event.businessIncomeModifier !== undefined ? { businessIncomeModifier: event.businessIncomeModifier } : {}),
+    ...(event.businessExpenseModifier !== undefined ? { businessExpenseModifier: event.businessExpenseModifier } : {}),
+    ...(event.affectedSector !== undefined ? { affectedSector: event.affectedSector } : {}),
+    ...(event.affectedStock !== undefined ? { affectedStock: event.affectedStock } : {}),
+  });
   state.eventHistory.unshift({ id: `${event.id}_${Date.now()}`, day: state.currentDay, title: event.title, description: event.description, category: event.category });
   state.eventHistory = state.eventHistory.slice(0, 30);
   recordTransaction(state, "random_event", event.cashEffect ?? 0, event.title);
