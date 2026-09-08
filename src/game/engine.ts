@@ -129,7 +129,8 @@ export function advanceDay(state: GameState) {
     const amount = Math.round((business.baseIncome + business.incomeGrowth * (owned.level - 1)) * (1 + modifier));
     if (amount > 0) { addMoney(state, amount, "business_income", `${business.name} daily income`); income += amount; }
   });
-  const expenses = calculateDailyExpenses(state);
+  const expenseModifier = state.activeModifiers.reduce((total, active) => total + (active.businessExpenseModifier ?? 0), 0);
+  const expenses = Math.round(calculateDailyExpenses(state) * (1 + expenseModifier));
   if (expenses > 0) { removeMoney(state, Math.min(state.player.cash, expenses), "daily_expense", "Lifestyle and operating expenses"); }
   state.dailyIncome = income;
   state.dailyExpenses = expenses;
