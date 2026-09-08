@@ -87,9 +87,9 @@ export function startInvestment(state: GameState, definitionId: string, principa
 function updateStocks(state: GameState) {
   const sectorNoise: Record<string, number> = {};
   stocks.forEach((stock) => {
-    sectorNoise[stock.sector] ??= (Math.random() - 0.5) * 0.018;
+    const noise = (sectorNoise[stock.sector] ??= (Math.random() - 0.5) * 0.018);
     const modifier = state.activeModifiers.reduce((total, active) => total + ((active.affectedStock === stock.id || active.affectedSector === stock.sector) ? active.marketModifier ?? 0 : 0), 0);
-    const movement = marketBias[state.marketCondition] * stock.marketSensitivity + sectorNoise[stock.sector] + (Math.random() - 0.5) * stock.volatility * 2 + modifier;
+    const movement = marketBias[state.marketCondition] * stock.marketSensitivity + noise + (Math.random() - 0.5) * stock.volatility * 2 + modifier;
     state.marketPrices[stock.id] = Math.max(1, Math.round(getStockPrice(state, stock.id) * (1 + movement) * 100) / 100);
   });
 }
